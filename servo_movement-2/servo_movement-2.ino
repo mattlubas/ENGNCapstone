@@ -14,6 +14,8 @@ int pos;
 float deg; // 
 int N = 180; //period in number of integer steps
 
+tidal_vol = max_d * area;
+
 //// Initial Input for Freqency, Conversion to Time Delay
 
 float f = 2 ;// frequency of the device. Units in Hz  // Integrate as a user function.
@@ -21,15 +23,12 @@ float pos_add = 3; //angle between each step
 float step_total = N / pos_add;
 float time_delay = 1000/(step_total*f); //number of steps 
 
-
-
 void setup() {
   myservo.attach(9);
   Serial.begin(57600);
   Serial1.begin(57600);
   myservo.write(amp/k); // move the servo motor to that position.
 
-  // Integrating desired frequency calculation
 }
 
 void loop() {
@@ -39,7 +38,6 @@ void loop() {
   float theta = amp/k; //angle moved by the servo motor
   deg = 2*PI*pos/N;
   x = 90 + theta * sin (deg);
-  tidal_vol = max_d * area;
   
   Serial.println(x);
   //Serial1.println(x);
@@ -47,12 +45,9 @@ void loop() {
   //Serial1.println(tidal_vol);
   float time_final =micros();
   float time_taken = time_final - time_initial;
-  //Serial1.println(time_taken);
   myservo.write (x);
   Serial.println("Time Delay:");
   Serial.println(time_delay);
-  //Serial.println("Time Taken:");
-  //Serial.println(time_taken);
   delay(time_delay);
   }
 }
