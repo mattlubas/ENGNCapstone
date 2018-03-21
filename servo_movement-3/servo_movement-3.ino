@@ -6,10 +6,10 @@
 
 Servo myservo;
 float angle_servo;
-float area = 452.25; // area of the piston cylinder in mm^2
-float k = 0.2485; // slope of the linear part of the wave //
+float area = 452.25; // cross sectional area of the piston cylinder in mm^2
+float k = 0.2485; // slope of the linear part of the wave // mm / degrees
 //float k = -0.2635; // mm/degree (mm per degree)
-float pos;
+float step_index;
 float rad; 
 int N = 180; //period in number of integer steps
 
@@ -25,7 +25,7 @@ float tidal_vol_mm3 = tidal_vol *1000;
 float delta_x = tidal_vol_mm3 / area;
 
 
-float theta_i = 0;  //theta_i is in degrees.
+float theta_i = 0;  // Initial theta angle for writing servo ... theta_i is in degrees.
 float x_i = k*theta_i;
 
 float x_f = delta_x + x_i;
@@ -44,12 +44,13 @@ float FRC_initial = 60 + delta_theta/2 ; //angle, placeholder for finding the FR
 //////////////////////////////////////////////////////////
 
 float f = 2 ;// frequency of the device. Units in Hz  // Integrate as a user function.
+//****Micro seconds for USB connection, but Bluetooth maybe much larger delay for delay count.
 
 float deg_add = 3; //angle between each step
 
 float step_total = N / deg_add; 
 
-float time_delay = 1000/(step_total*f); //number of steps 
+float time_delay = 1000/(step_total*f); //number of steps *****
 
 //// Initial Bar Lengths and Angle Definitions for 4 Bar Crank and Slider
 float a = 1.5; // cm. Length of Bar 1, the servo hub.
@@ -60,16 +61,18 @@ float theta3; //degrees or radians. The angle of the piston cylinder which calcu
 void setup() {
   myservo.attach(9);
   Serial.begin(57600);
-  Serial1.begin(57600);
+  Serial1.begin(57600); //Bluetooth 9600 assuredly
   myservo.write(FRC_initial); // move the servo motor to that position.
   
 }
 
 void loop() {
-  for (pos = 0; pos <= 180; pos=pos+deg_add)
+  for (step_index = 0; step_index <= N; step_index=step_index+deg_add)
   { 
+
+  float time_initial = micros();
   float AMP = (theta_f - theta_i)*k; //angle moved by the servo motor
-  rad = pos * 2000 / 57296; // converting angle deg to radians for the below sine function
+  rad = step_index * 2000 / 57296; // converting angle deg to radians through approximation
   //its 2000 in order to incorporate negative and positive outputs from the below sine function
 
   angle_servo = FRC_initial + 2*AMP * sin (rad); // x is starting from mid-point, 90, and is the angle used to write the servo motor.
@@ -89,6 +92,11 @@ void loop() {
   
   //Serial.println("Time Delay:");
   //Serial.println(time_delay);
+  float time_final = micros();
+  float time_total = time_final- time_initial;
+  Serial.println("time_total");
+  Serial.println(time_total);
+  
   delay(time_delay);
   }
 }
