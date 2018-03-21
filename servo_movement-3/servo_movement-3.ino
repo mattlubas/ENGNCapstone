@@ -1,6 +1,7 @@
 //This code programs a servo motor move a specified angle.This angle
 //will then determine how much the piston cylinder needs to move.
 //Author: Alfred Rwagaju, Matt Lubas, Eric Wirth
+
 #include <Servo.h>
 
 Servo myservo;
@@ -9,7 +10,7 @@ float max_d = 1.39; // maximum distance by the piston in cm. // May change based
 float area = 452.25; // area of the piston cylinder in mm^2
 float amp = max_d/2; //amplitude
 float k = 0.02485; // slope of the linear part of the wave
-
+float pos;
 float deg; // 
 int N = 180; //period in number of integer steps
 
@@ -26,9 +27,11 @@ float tidal_vol_mm3 = tidal_vol *1000;
 //finding change in distance that the piston cylinder will move through
 float delta_x = tidal_vol / area;
 
-//set theta_i to zero, forcing x_i to be equal to zero. 
+//DO NOT DELETE THIS COMMENT -set theta_i to zero, forcing x_i to be equal to zero.  
 //Setting theta_i to a non-zero value will be important for finding and setting the 
 // functional residual capacity (FRC) of the device.
+// This can be done by finding the distance from most extended linear point 
+// (whether from low bound or high bound
 
 float theta_i = 0;  //theta_i is in degrees.
 float x_i = k*theta_i;
@@ -61,18 +64,18 @@ void setup() {
 }
 
 void loop() {
-  for (deg = 0; deg <= N; deg=deg+deg_add)
+  for (pos = 0; pos <= N; pos=pos+deg_add)
   { 
   
   float theta = amp/k; //angle moved by the servo motor
-  deg = 2*PI*deg/N;
+  deg = 2*PI*pos/N;
   x = 90 + theta * sin (deg); // x is starting from mid-point, 90, and is the angle used to write the servo motor.
 
   
   //Serial.println(deg_theta3);
-  Serial.println(x);
-  //float distance = x* k;
-  //Serial.println(distance); //position of the motor over time.
+  //Serial.println(x);
+  float distance = x*k;
+  Serial.println(distance); //position of the motor over time.
   //Serial1.println(x);
   //Serial1.println("tv:");
   //Serial1.println(tidal_vol);
