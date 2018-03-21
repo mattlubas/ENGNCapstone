@@ -11,6 +11,7 @@ float amp = max_d/2; //amplitude
 float k = 0.02485; // slope of the linear part of the wave
 
 float deg; // 
+float rad; // 
 int N = 180; //period in number of integer steps
 
 //float tidal_vol = max_d * area;
@@ -65,8 +66,8 @@ void loop() {
   { 
   
   float theta = amp/k; //angle moved by the servo motor
-  deg = 2*PI*deg/N;
-  x = 90 + theta * sin (deg); // x is starting from mid-point, 90, and is the angle used to write the servo motor.
+  rad = 2*PI*deg/N;
+  x = 90 + theta * sin (rad); // x is starting from mid-point, 90, and is the angle used to write the servo motor.
 
   
   //Serial.println(deg_theta3);
