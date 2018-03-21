@@ -42,14 +42,17 @@ float theta_f = x_f /k; //theta_f units in degrees.
 float delta_theta = theta_f - theta_i;
 
 
-float FRC_initial = 60; //angle, placeholder for finding the FRC of the device
+float FRC_initial = 60 + delta_theta/2 ; //angle, placeholder for finding the FRC of the device
+//desired FRC around 4 mL, should be 8.844 mm away from front of PA. This can be estimated for 
+//validation, and calibrated easily later by increasing/ decreasing angle.
+//This should be the smallest the motor ever goes.
 
 
 //////////////////////////////////////////////////////////
 //// Initial Input for Freqency, Conversion to Time Delay
 //////////////////////////////////////////////////////////
 
-float f = 1.5 ;// frequency of the device. Units in Hz  // Integrate as a user function.
+float f = 2 ;// frequency of the device. Units in Hz  // Integrate as a user function.
 float deg_add = 3; //angle between each step
 
 float step_total = N / deg_add;  // delta_theta used to be N
@@ -92,8 +95,8 @@ void loop() {
   //Serial.println("Theta_f");
   //Serial.println(sine);
 
-  Serial.println("angle servo");
-  Serial.println(angle_servo);
+  //Serial.println("angle servo");
+  //Serial.println(angle_servo);
 
   Serial.println("distance");
   Serial.println(distance);
