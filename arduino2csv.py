@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 #This code exports data from arduino to excel
-from serial import Serial
 
-ARDUINO = '/dev/cu.usbmodem414'
+import serial 
+
+ARDUINO = '/dev/cu.usbmodem1649921'
 BAUD    = 57600
 OUTFILE = 'arduino.csv'
 
-arduino = Serial(ARDUINO, BAUD)
+arduino = serial.Serial(ARDUINO, BAUD)
 
 print('Connected; writing to file ' + OUTFILE)
 

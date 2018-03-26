@@ -24,7 +24,6 @@ float tidal_vol_mm3 = tidal_vol *1000;
 //finding change in distance that the piston cylinder will move through
 float delta_x = tidal_vol_mm3 / area;
 
-
 float theta_i = 0;  // Initial theta angle for writing servo ... theta_i is in degrees.
 float x_i = k*theta_i;
 
@@ -32,17 +31,14 @@ float x_f = delta_x + x_i;
 float theta_f = x_f /k; //theta_f units in degrees.
 float delta_theta = theta_f - theta_i;
 
-
 float FRC_initial = 60 + delta_theta/2 ; //angle, placeholder for finding the FRC of the device
 //desired FRC around 4 mL, should be 8.844 mm away from front of PA. This can be estimated for 
 //validation, and calibrated easily later by increasing/ decreasing angle.
 //This should be the smallest the motor ever goes.
 
-
 //////////////////////////////////////////////////////////
 //// Initial Input for Freqency, Conversion to Time Delay
 //////////////////////////////////////////////////////////
-
 float f = 2 ;// frequency of the device. Units in Hz  // Integrate as a user function.
 //****Micro seconds for USB connection, but Bluetooth maybe much larger delay for delay count.
 
@@ -58,6 +54,9 @@ float b= 4.6  ; //cm. Length of Bar 2, the Pneumatic actuator bar.
 float c = 0; //cm. Will put in an offset soon. The seperation horizontally between the servo motor and piston cylinder.
 float theta3; //degrees or radians. The angle of the piston cylinder which calculates the volume.
 
+//Initializes Time of Study to be used as a global variable.
+float time_initial = micros();
+
 void setup() {
   myservo.attach(9);
   Serial.begin(57600);
@@ -69,8 +68,6 @@ void setup() {
 void loop() {
   for (step_index = 0; step_index <= N; step_index=step_index+deg_add)
   { 
-
-  float time_initial = micros();
   float AMP = (theta_f - theta_i)*k; //angle moved by the servo motor
   rad = step_index * 2000 / 57296; // converting angle deg to radians through approximation
   //its 2000 in order to incorporate negative and positive outputs from the below sine function
@@ -80,22 +77,16 @@ void loop() {
   //Amplitude is doubled to reach the amplitude desired.
   
   float distance = angle_servo*k;
-  
-  //Serial1.println(x);
 
   //Serial.println("angle servo");
   //Serial.println(angle_servo);
   myservo.write (angle_servo);
   
-  Serial.println("distance");
-  Serial.println(distance);
-  
   //Serial.println("Time Delay:");
   //Serial.println(time_delay);
-  float time_final = micros();
-  float time_total = time_final- time_initial;
-  Serial.println("time_total");
-  Serial.println(time_total);
+  float time_final = micros() - time_initial;
+
+  Serial.printf("Distance: %f,\t Time: %f \n", distance, time_final);
   
   delay(time_delay);
   }
