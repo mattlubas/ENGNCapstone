@@ -62,6 +62,7 @@ void setup() {
   Serial.begin(57600);
   Serial1.begin(57600); //Bluetooth 9600 assuredly
   myservo.write(FRC_initial); // move the servo motor to that position.
+  Serial.printf("Distance: \t Time: \n");
   
 }
 
@@ -86,7 +87,7 @@ void loop() {
   //Serial.println(time_delay);
   float time_final = micros() - time_initial;
 
-  Serial.printf("Distance: %f,\t Time: %f \n", distance, time_final);
+  Serial.printf("%f,\t %f \n", distance, time_final);
   
   delay(time_delay);
   }

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 #This code exports data from arduino to excel
 
-import serial 
+import serial
+#if having an import error, pip3 install pyserial using terminal.
 
 ARDUINO = '/dev/cu.usbmodem1649921'
 BAUD    = 57600
