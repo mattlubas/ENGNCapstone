@@ -51,7 +51,7 @@ float time_delay = 1000/(step_total*f); //number of steps *****
 //// Initial Bar Lengths and Angle Definitions for 4 Bar Crank and Slider
 float a = 1.5; // cm. Length of Bar 1, the servo hub.
 float b= 4.6  ; //cm. Length of Bar 2, the Pneumatic actuator bar.
-float c = 0; //cm. Will put in an offset soon. The seperation horizontally between the servo motor and piston cylinder.
+float c = 0.5; //cm. NEW OFFSET. The seperation horizontally between the servo motor and piston cylinder.
 float theta3; //degrees or radians. The angle of the piston cylinder which calculates the volume.
 
 //Initializes Time of Study to be used as a global variable.
