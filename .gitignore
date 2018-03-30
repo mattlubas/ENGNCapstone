@@ -1,0 +1,4 @@
+# Excel / CSV git ignore
+*.csv
+*.xls
+*.xlm
