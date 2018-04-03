@@ -2,3 +2,8 @@
 *.csv
 *.xls
 *.xlm
+
+#Ignores videos if applicable
+*.mov
+*.m4v
+

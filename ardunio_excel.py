@@ -4,7 +4,8 @@ This code exports data from arduino to excel and allows user input of tidal volu
 Authors: Alfred Rwagaju, Professor Simon Levy, Matt Lubas, Eric Wirth
 '''
 
-ARDUINO = '/dev/cu.usbmodem1365201'
+#Arduino connection may need to be change each time it connects. 
+ARDUINO = '/dev/cu.usbmodem3925581'
 BAUD    = 57600
 
 from threading import Thread
@@ -35,7 +36,6 @@ def create_excel():
     """Creates an Excel file with name and correct serial port"""
 
     filename = datetime.fromtimestamp(time()).strftime('%Y-%m-%d %H-%M-%S') + '.csv'
-
     print('Writing to ' + filename)
 
     file = open(filename, 'w')
@@ -51,6 +51,7 @@ if __name__ == '__main__':
     arduino = Serial(ARDUINO, BAUD)
 
     filename = datetime.fromtimestamp(time()).strftime('%Y-%m-%d %H-%M-%S') + '.csv'
+   
 
     print('Writing to ' + filename)
 
@@ -87,7 +88,7 @@ if __name__ == '__main__':
             file.close()
 
             filename = datetime.fromtimestamp(time()).strftime('%Y-%m-%d %H-%M-%S') + '.csv'
-
+    
             print('Writing to ' + filename)
 
             file = open(filename, 'w')
