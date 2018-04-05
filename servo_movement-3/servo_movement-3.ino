@@ -8,7 +8,8 @@ Servo myservo;
 
 // Constants
 static const float area = 452.25; 			// cross sectional area of the piston cylinder in mm^2
-static const float k = 0.269; 				// slope of the linear part of the wave // mm / degrees
+static const float k = 0.2485; 				// slope of the linear part of the wave // mm / degrees
+//static const float k = -0.2635; 			// mm/degree (mm per degree)
 static const int N = 180; 				// period in number of integer steps
 static const float deg_add = 3; 			// angle between each step
 static const float theta_i = 0;  // Initial theta angle for writing servo ... theta_i is in degrees.
@@ -31,7 +32,7 @@ void setup() {
 
 	myservo.attach(9);
 	Serial.begin(57600);
-	Serial1.begin(57600); //Bluetooth 9600 assuredly
+	Serial1.begin(57600); //Bluetooth connection
 	time_initial = micros();
 }
 
@@ -70,6 +71,20 @@ void loop() {
 		message[0] = 0;
 		messageIndex = 0;
 	}
+   //checking bluetooth connection
+   if (Serial1.available()) {
+
+   while (Serial1.available()) {
+      message[messageIndex] = Serial1.read();
+      messageIndex++;
+    }
+  }
+  else if (messageIndex > 0) {
+    sscanf(message, "%f %f", &tidal_vol, &f); 
+    Serial1.printf("Tidal volume: %f   Frequency: %f\n", tidal_vol, f);
+    message[0] = 0;
+    messageIndex = 0;
+  }
 
 	// Run the motors based on our computations ----------------------------------------------------
 	for (float step_index = 0; step_index <= N; step_index=step_index+deg_add) {
@@ -98,6 +113,9 @@ void loop() {
 		unsigned long time_final = micros() - time_initial;
 
 		Serial.printf("%f,%d\n", distance, time_final);
+    Serial1.printf("%f,%d\n", distance, time_final); //bluetooth connection
+    
+
 
 		delay(time_delay);
 	}
