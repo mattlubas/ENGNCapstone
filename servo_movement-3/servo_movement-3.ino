@@ -8,7 +8,7 @@ Servo myservo;
 
 // Constants
 static const float area = 452.25; 			// cross sectional area of the piston cylinder in mm^2
-static const float k = 0.2485; 				// slope of the linear part of the wave // mm / degrees
+static const float k = 0.269; 				// slope of the linear part of the wave // mm / degrees
 //static const float k = -0.2635; 			// mm/degree (mm per degree)
 static const int N = 180; 				// period in number of integer steps
 static const float deg_add = 3; 			// angle between each step
