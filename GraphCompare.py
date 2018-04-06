@@ -30,10 +30,12 @@ def TidalVolume(file):
 
     df['t'] = (df['t'] - t_start) /1000000
     d = df['d']
-    
+
+    #Globals used here because of sloppy half functions/ half not code.
     global tv_expected
     global x 
     global t_expected
+    
     x= [] #create list of x in order to use floats instead of strings.
     for item in d:
         
@@ -43,21 +45,15 @@ def TidalVolume(file):
         temp = float(item) *k_ratio
         x.append(float(temp))
 
+    #Code that is not used here , but may need to be to correspond the two
+    # graphs
     x_mean = sum(x)/ len(x)
     #print(x_mean)
     x_mode = max(set(x), key=x.count)
-    #print (x_mode)
 
     #turns the list into a numpy array for finding max and mins
     x_array = np.array(x) 
 
-    # for local maxima
-    
-    #argrelextrema(x_array, np.greater)
-
-    
-    # for local minima
-    #argrelextrema(x_array, np.less)
 
     #Finds all the local mins and maxes
     tv_maxes = x_array[argrelextrema(x_array, np.greater )]
@@ -75,6 +71,22 @@ def TidalVolume(file):
     return x_array, tv_expected
 
 
+def Plotting(tv_expected, tv_actual, file):
+    """Creates and saves a beautiful plot of tidal volume based on expected and
+    actual tidal volume"""
+    
+    #Plots
+    plt.plot(tv_expected,'r-', label ='Expected Tidal Volume- Teensy')
+    plt.plot(tv,'b-', label = 'Actual Tidal Volume- Video Data')
+
+    #Axis Labels, Title, and Legend
+    plt.xlabel('Time')
+    plt.ylabel('Tidal Volume')
+    plt.title('Tidal Volume: Expected vs Actual '+ file)
+    plt.legend()
+
+    plt.savefig('TidalVolume-'+file+'.png', bbox_inches='tight')
+    plt.show()
 
 #TidalVolume("R-1-1.4-1.csv")
 #TidalVolume("R-1-1.4-1.xls")
@@ -157,18 +169,8 @@ print(mean_tv)
 
 tv = [i for i in tv if i > mean_tv/2] 
 
-#Plots
-plt.plot(tv_expected,'r-', label ='Expected Tidal Volume- Teensy')
-plt.plot(tv,'b-', label = 'Actual Tidal Volume- Video Data')
 
-#Axis Labels, Title, and Legend
-plt.xlabel('Time')
-plt.ylabel('Tidal Volume')
-plt.title('Tidal Volume: Expected vs Actual '+ file)
-plt.legend()
-
-plt.savefig('TidalVolume-'+file+'.png', bbox_inches='tight')
-plt.show()
+Plotting(tv_expected,tv,file)
 
 
 
