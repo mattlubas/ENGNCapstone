@@ -3,15 +3,21 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import numpy as np
 from scipy.signal import argrelextrema
 import xlrd
+import peakutils
+
 
 
 def TidalVolume(file):
     """Name csv or xls file to take the data, find local maximums and minimums
     using numpy and argrelextrema. Reports a list of tidal volumes between
     local minimums and maximums. Plots this as well. """
+
+    k_ratio = 0.2485/0.269 #conversion because k value was not re-calculated when
+    #we ran the first sampling.
 
     if file[-4:] == ".csv":
         headers = ['d', 't']
@@ -27,8 +33,8 @@ def TidalVolume(file):
 
     df['t'] = (df['t'] - t_start) /1000000
     d = df['d']
-    print(df['t'])
     
+    global tv_expected
     global x 
     global t_expected
     x= [] #create list of x in order to use floats instead of strings.
@@ -36,84 +42,160 @@ def TidalVolume(file):
         
         if item[:5] == "Tidal":
             item = 0
-       
-        x.append(float(item))
-                              
+
+        temp = float(item) *k_ratio
+        x.append(float(temp))
+
+    x_mean = sum(x)/ len(x)
+    #print(x_mean)
+    x_mode = max(set(x), key=x.count)
+    #print (x_mode)
 
     #turns the list into a numpy array for finding max and mins
     x_array = np.array(x) 
 
     # for local maxima
-    argrelextrema(x_array, np.greater)
+    
+    #argrelextrema(x_array, np.greater)
 
+    
     # for local minima
-    argrelextrema(x_array, np.less)
+    #argrelextrema(x_array, np.less)
 
     #Finds all the local mins and maxes
-    tv_maxes = x_array[argrelextrema(x_array, np.greater)]
+    tv_maxes = x_array[argrelextrema(x_array, np.greater )]
     tv_mins = x_array[argrelextrema(x_array, np.less)]
 
+    print(tv_maxes)
+    print(tv_mins)
+
     #Finds the tidal volume by the difference between the local maxes and mins.
-    tv = tv_maxes - tv_mins
-    print(tv)
+    tv_expected = tv_maxes - tv_mins
+    print(tv_expected)
 
-    t_expected = df['t']
+    
 
-    plt.plot(tv)
+    plt.plot(tv_expected)
     plt.show()
-    return x_array, t_expected
+    return x_array, tv_expected
+
+
 
 #TidalVolume("R-1-1.4-1.csv")
 #TidalVolume("R-1-1.4-1.xls")
 
-
 TidalVolume("R-3-3-1.csv")
+
+###################################
+###################################
+TidalVolume("R-3-3-1.csv")
+file = "R-3-3-1"
+
+###################################
+###################################
+
+
 
 Fs = 240.0  # sampling rate
 Ts = 1.0/Fs # sampling interval
 
-df = pd.read_excel("R-3-3-1.xls")
-print(df)
+k_ratio = 0.2485/0.269 #conversion because k value was not re-calculated when
+#we ran the first sampling.
 
+
+df = pd.read_excel(file +".xls")
 length =len(df.index)
 
 first_row = 16
 
 points = length- first_row
 d = []
+
 t = []
 
 for i in range(first_row,points):
     temp=df.iloc[i, 0]
-    d.append(float(temp))
+    d_adjusted = (float(temp))*10 #multiple by 10 to convert to millimeters
+    d.append(float(d_adjusted))
 
 for i in range(first_row,points):
     temp=df.iloc[i, 2]
     t_adjusted = (float(temp))/Fs #Adjusts to same framerate
     t.append(t_adjusted)
 
+dual_data = []
+for i in range(0, len(d)):
+    dual_data.append([d[i],t[i]])
 
-x_array = np.array(d) 
+x_array = np.array(d)
+
 
 # for local maxima
-argrelextrema(x_array, np.greater)
+#print("Look Here !")
+#argrelextrema(x_array, np.greater, order=3)
+
 
 # for local minima
-argrelextrema(x_array, np.less)
+#argrelextrema(x_array, np.less)
 
 #Finds all the local mins and maxes
-tv_maxes = x_array[argrelextrema(x_array, np.greater)]
-tv_mins = x_array[argrelextrema(x_array, np.less)]
+tv_maxes = x_array[argrelextrema(x_array, np.greater_equal, order =7)]
+tv_mins = x_array[argrelextrema(x_array, np.less_equal, order = 5)]
 
+"""
 plt.plot(t,d,'r-', t_expected,x,'b-')
 plt.show()
-
+"""
 print(tv_maxes)
+
 print(tv_mins)
 
+
+
 #Finds the tidal volume by the difference between the local maxes and mins.
-tv = tv_maxes - tv_mins
+#In a way that only runs for the number of variables.
+if len(tv_maxes) < len(tv_mins):
+    tv = []
+    for i in range(0, len(tv_maxes)):
+        tv.append(tv_maxes[i]-tv_mins[i])
+    
+elif len(tv_maxes) > len(tv_mins):
+    tv = []
+    for i in range(0, len(tv_mins)):
+        tv.append(tv_maxes[i]-tv_mins[i])
+        
+else:
+    tv = tv_maxes - tv_mins
+
 print(tv)
+
+mean_tv = sum(tv)/len(tv)
+print(mean_tv)
+"""
+for i in tv:
+    if i < mean_tv:
+"""
+#removes all correspondence that does not fall within this range,
+#above half of mean value
+tv = [i for i in tv if i > mean_tv/2] 
+
+
+
+expected = mpatches.Patch(color='red', label='Expected Teensy Output')
+actual = mpatches.Patch(color='blue', label='Actual Video Data')
+
+
+plt.plot(tv_expected,'r-', label ='Expected Tidal Volume- Teensy')
+plt.plot(tv,'b-', label = 'Actual Tidal Volume- Video Data')
+plt.xlabel('Time')
+plt.ylabel('Tidal Volume')
+plt.title('Tidal Volume: Expected vs Actual '+ file)
+plt.legend()
+
+
+
+plt.show()
+
 
 
 
