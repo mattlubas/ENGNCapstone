@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import argrelextrema
 
-
+PA = 452.25 / 1000
+#mm^2 is piston area of pneumatic actuator. Divides by 1000 to convert mm^3 to
+#milliliters (mL)
 
 def TidalVolume(file):
     """Name csv or xls file to take the data, find local maximums and minimums
@@ -42,7 +44,7 @@ def TidalVolume(file):
         if item[:5] == "Tidal":
             item = 0
 
-        temp = float(item) *k_ratio
+        temp = float(item) #*k_ratio
         x.append(float(temp))
 
     #Code that is not used here , but may need to be to correspond the two
@@ -51,13 +53,21 @@ def TidalVolume(file):
     #print(x_mean)
     x_mode = max(set(x), key=x.count)
 
+
+    #Turns Tidal Volume from a distance measure to a Volume
+    
+    
+    
     #turns the list into a numpy array for finding max and mins
-    x_array = np.array(x) 
+    x_array = np.array(x)
+
+    x_Volume = x_array * PA
+
 
 
     #Finds all the local mins and maxes
-    tv_maxes = x_array[argrelextrema(x_array, np.greater )]
-    tv_mins = x_array[argrelextrema(x_array, np.less)]
+    tv_maxes = x_Volume[argrelextrema(x_Volume, np.greater )]
+    tv_mins = x_Volume[argrelextrema(x_Volume, np.less)]
 
     #print(tv_maxes)
     #print(tv_mins)
@@ -65,6 +75,7 @@ def TidalVolume(file):
     #Finds the tidal volume by the difference between the local maxes and mins.
     tv_expected = tv_maxes - tv_mins
     #print(tv_expected)
+
 
     #plt.plot(tv_expected)
     #plt.show()
@@ -80,8 +91,8 @@ def Plotting(tv_expected, tv_actual, file):
     plt.plot(tv,'b-', label = 'Actual Tidal Volume- Video Data')
 
     #Axis Labels, Title, and Legend
-    plt.xlabel('Time')
-    plt.ylabel('Tidal Volume')
+    plt.xlabel('Time (milliseconds)')
+    plt.ylabel('Tidal Volume (mL)')
     plt.title('Tidal Volume: Expected vs Actual '+ file)
     plt.legend()
 
@@ -105,7 +116,7 @@ TidalVolume(file+".csv")
 Fs = 240.0  # sampling rate
 Ts = 1.0/Fs # sampling interval
 
-k_ratio = 0.2485/0.269 #conversion because k value was not re-calculated when
+k_ratio = 0.269/.2485 #conversion because k value was not re-calculated when
 #we ran the first sampling.
 
 df = pd.read_excel(file +".xls")
@@ -135,11 +146,16 @@ for i in range(0, len(d)):
     dual_data.append([d[i],t[i]])
 
 #turning the normal list into a numpy array
+
 x_array = np.array(d)
 
+x_Volume = PA * x_array
+
+x_Volume = k_ratio *x_Volume
+
 #Finds all the local mins and maxes
-tv_maxes = x_array[argrelextrema(x_array, np.greater_equal, order =7)]
-tv_mins = x_array[argrelextrema(x_array, np.less_equal, order = 5)]
+tv_maxes = x_Volume[argrelextrema(x_Volume, np.greater_equal, order =7)]
+tv_mins = x_Volume[argrelextrema(x_Volume, np.less_equal, order = 5)]
 
 
 #Finds the tidal volume by the difference between the local maxes and mins.
@@ -159,7 +175,8 @@ elif len(tv_maxes) > len(tv_mins):
 else:
     tv = tv_maxes - tv_mins
 
-#print(tv)
+#Turns TV from a distance measure to a volume measure.
+
 
 mean_tv = sum(tv)/len(tv)
 print(mean_tv)
