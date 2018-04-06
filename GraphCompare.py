@@ -3,11 +3,8 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 import numpy as np
 from scipy.signal import argrelextrema
-import xlrd
-import peakutils
 
 
 
@@ -99,15 +96,16 @@ Ts = 1.0/Fs # sampling interval
 k_ratio = 0.2485/0.269 #conversion because k value was not re-calculated when
 #we ran the first sampling.
 
-
 df = pd.read_excel(file +".xls")
 length =len(df.index)
 
+#position where Kinovea values start
 first_row = 16
 
 points = length- first_row
+#two lists for time and distance.... may remove, but could be useful for
+# a side by side comparison of actual values.
 d = []
-
 t = []
 
 for i in range(first_row,points):
@@ -124,34 +122,18 @@ dual_data = []
 for i in range(0, len(d)):
     dual_data.append([d[i],t[i]])
 
+#turning the normal list into a numpy array
 x_array = np.array(d)
-
-
-# for local maxima
-#print("Look Here !")
-#argrelextrema(x_array, np.greater, order=3)
-
-
-# for local minima
-#argrelextrema(x_array, np.less)
 
 #Finds all the local mins and maxes
 tv_maxes = x_array[argrelextrema(x_array, np.greater_equal, order =7)]
 tv_mins = x_array[argrelextrema(x_array, np.less_equal, order = 5)]
 
-"""
-plt.plot(t,d,'r-', t_expected,x,'b-')
-plt.show()
-"""
-#finding the local maximums of the samples
-print(tv_maxes)
-#finds the local minimums of the samples
-print(tv_mins)
-
 
 #Finds the tidal volume by the difference between the local maxes and mins.
 #In a way that only runs for the number of variables for the minimal one
-#This part takes the difference of the two 
+#This part takes the difference of the two
+
 if len(tv_maxes) < len(tv_mins):
     tv = []
     for i in range(0, len(tv_maxes)):
@@ -165,16 +147,15 @@ elif len(tv_maxes) > len(tv_mins):
 else:
     tv = tv_maxes - tv_mins
 
-print(tv)
+#print(tv)
 
 mean_tv = sum(tv)/len(tv)
 print(mean_tv)
 
 #removes all correspondence that does not fall within this range,
 #above half of mean value
+
 tv = [i for i in tv if i > mean_tv/2] 
-
-
 
 #Plots
 plt.plot(tv_expected,'r-', label ='Expected Tidal Volume- Teensy')
