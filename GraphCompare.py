@@ -66,17 +66,15 @@ def TidalVolume(file):
     tv_maxes = x_array[argrelextrema(x_array, np.greater )]
     tv_mins = x_array[argrelextrema(x_array, np.less)]
 
-    print(tv_maxes)
-    print(tv_mins)
+    #print(tv_maxes)
+    #print(tv_mins)
 
     #Finds the tidal volume by the difference between the local maxes and mins.
     tv_expected = tv_maxes - tv_mins
-    print(tv_expected)
+    #print(tv_expected)
 
-    
-
-    plt.plot(tv_expected)
-    plt.show()
+    #plt.plot(tv_expected)
+    #plt.show()
     return x_array, tv_expected
 
 
@@ -84,12 +82,11 @@ def TidalVolume(file):
 #TidalVolume("R-1-1.4-1.csv")
 #TidalVolume("R-1-1.4-1.xls")
 
-TidalVolume("R-3-3-1.csv")
+###################################
+###################################
 
-###################################
-###################################
-TidalVolume("R-3-3-1.csv")
 file = "R-3-3-1"
+TidalVolume(file+".csv")
 
 ###################################
 ###################################
@@ -146,14 +143,15 @@ tv_mins = x_array[argrelextrema(x_array, np.less_equal, order = 5)]
 plt.plot(t,d,'r-', t_expected,x,'b-')
 plt.show()
 """
+#finding the local maximums of the samples
 print(tv_maxes)
-
+#finds the local minimums of the samples
 print(tv_mins)
 
 
-
 #Finds the tidal volume by the difference between the local maxes and mins.
-#In a way that only runs for the number of variables.
+#In a way that only runs for the number of variables for the minimal one
+#This part takes the difference of the two 
 if len(tv_maxes) < len(tv_mins):
     tv = []
     for i in range(0, len(tv_maxes)):
@@ -171,30 +169,27 @@ print(tv)
 
 mean_tv = sum(tv)/len(tv)
 print(mean_tv)
-"""
-for i in tv:
-    if i < mean_tv:
-"""
+
 #removes all correspondence that does not fall within this range,
 #above half of mean value
 tv = [i for i in tv if i > mean_tv/2] 
 
 
 
-expected = mpatches.Patch(color='red', label='Expected Teensy Output')
-actual = mpatches.Patch(color='blue', label='Actual Video Data')
-
-
+#Plots
 plt.plot(tv_expected,'r-', label ='Expected Tidal Volume- Teensy')
 plt.plot(tv,'b-', label = 'Actual Tidal Volume- Video Data')
+
+#Axis Labels, Title, and Legend
 plt.xlabel('Time')
 plt.ylabel('Tidal Volume')
 plt.title('Tidal Volume: Expected vs Actual '+ file)
 plt.legend()
 
-
-
+plt.savefig('TidalVolume-'+file+'.png', bbox_inches='tight')
 plt.show()
+
+
 
 
 

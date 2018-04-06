@@ -3,6 +3,9 @@
 *.xls
 *.xlm
 
+#Ignore Photos
+*.png
+
 #Ignores videos if applicable
 *.mov
 *.m4v
