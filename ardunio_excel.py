@@ -5,7 +5,7 @@ Authors: Alfred Rwagaju, Professor Simon Levy, Matt Lubas, Eric Wirth
 '''
 
 #Arduino connection may need to be change each time it connects. 
-ARDUINO = '/dev/cu.usbmodem3925581'
+ARDUINO = '/dev/cu.usbmodem3893241'
 BAUD    = 57600
 
 from threading import Thread

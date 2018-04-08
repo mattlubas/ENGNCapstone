@@ -66,8 +66,8 @@ void loop() {
   float tidal_vol_mm3 = tidal_vol *1000;
   
   //Adaption factor for ensuring tidal volume is closer given mechanical errors.
-  //Unit Converstion from mL to mm^3
-  float adaption_mm= ((w* inv_nozzle_area + y*f + x)*1000)/area;
+  //Unit Converstion from mL to mm^3 
+  float adaptation_mm= ((w* inv_nozzle_area + y*f + x)*1000)/area;
 
 	//finding change in distance that the piston cylinder will move through
 	float delta_x = tidal_vol_mm3 / area;
@@ -116,7 +116,7 @@ void loop() {
 	// Run the motors based on our computations ----------------------------------------------------
 	for (float step_index = 0; step_index <= N; step_index=step_index+deg_add) {
 
-		float AMP = adaption_mm+(theta_f - theta_i)*k; //angle moved by the servo motor
+		float AMP = adaptation_mm+(theta_f - theta_i)*k; //angle moved by the servo motor
 		float rad = step_index * 2000 / 57296; // converting angle deg to radians through approximation
 		//its 2000 in order to incorporate negative and positive outputs from the below sine function
     // same as pi over 180.
