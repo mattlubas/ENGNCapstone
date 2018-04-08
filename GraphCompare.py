@@ -15,7 +15,7 @@ def TidalVolume(file):
     using numpy and argrelextrema. Reports a list of tidal volumes between
     local minimums and maximums. Plots this as well. """
 
-    k_ratio = 0.2485/0.269 #conversion because k value was not re-calculated when
+    #k_ratio = 0.2485/0.269  #conversion because k value was not re-calculated when
     #we ran the first sampling.
 
     if file[-4:] == ".csv":
@@ -57,23 +57,35 @@ def TidalVolume(file):
     #Turns Tidal Volume from a distance measure to a Volume
     
     
-    
     #turns the list into a numpy array for finding max and mins
     x_array = np.array(x)
 
     x_Volume = x_array * PA
 
 
-
     #Finds all the local mins and maxes
     tv_maxes = x_Volume[argrelextrema(x_Volume, np.greater )]
     tv_mins = x_Volume[argrelextrema(x_Volume, np.less)]
 
+
+    if len(tv_maxes) < len(tv_mins):
+        tv_expected = []
+        for i in range(0, len(tv_maxes)):
+            tv_expected.append(tv_maxes[i]-tv_mins[i])
+    
+    elif len(tv_maxes) > len(tv_mins):
+        tv_expected = []
+        for i in range(0, len(tv_mins)):
+            tv_expected.append(tv_maxes[i]-tv_mins[i])
+
+    else:
+        tv_expected = tv_maxes - tv_mins
+        
     #print(tv_maxes)
     #print(tv_mins)
 
     #Finds the tidal volume by the difference between the local maxes and mins.
-    tv_expected = tv_maxes - tv_mins
+    #tv_expected = tv_maxes - tv_mins
     #print(tv_expected)
 
 
@@ -82,21 +94,21 @@ def TidalVolume(file):
     return x_array, tv_expected
 
 
-def Plotting(tv_expected, tv_actual, file):
+def Plotting(tv_expected, tv_actual, mean_tv, file):
     """Creates and saves a beautiful plot of tidal volume based on expected and
     actual tidal volume"""
     
     #Plots
     plt.plot(tv_expected,'r-', label ='Expected Tidal Volume- Teensy')
-    plt.plot(tv,'b-', label = 'Actual Tidal Volume- Video Data')
+    plt.plot(tv,'b-', label = 'Actual Tidal Volume from Video Data. Median = %.02f mL' % (mean_tv))
 
     #Axis Labels, Title, and Legend
-    plt.xlabel('Time (milliseconds)')
+    plt.xlabel('Number of Breaths')
     plt.ylabel('Tidal Volume (mL)')
     plt.title('Tidal Volume: Expected vs Actual '+ file)
     plt.legend()
 
-    plt.savefig('TidalVolume-'+file+'.png', bbox_inches='tight')
+    plt.savefig(OutputFolder+'TidalVolume-'+file+'.png', bbox_inches='tight')
     plt.show()
 
 #TidalVolume("R-1-1.4-1.csv")
@@ -105,8 +117,13 @@ def Plotting(tv_expected, tv_actual, file):
 ###################################
 ###################################
 
-file = "R-3-3-1"
-TidalVolume(file+".csv")
+
+workbook = "TidalVolumeRuns/"
+file = "G-3-1.4-1"
+
+TidalVolume(workbook+file+".csv")
+
+OutputFolder = "TidalVolumeGraphs/"
 
 ###################################
 ###################################
@@ -119,7 +136,7 @@ Ts = 1.0/Fs # sampling interval
 k_ratio = 0.269/.2485 #conversion because k value was not re-calculated when
 #we ran the first sampling.
 
-df = pd.read_excel(file +".xls")
+df = pd.read_excel(workbook+file +".xls")
 length =len(df.index)
 
 #position where Kinovea values start
@@ -151,11 +168,11 @@ x_array = np.array(d)
 
 x_Volume = PA * x_array
 
-x_Volume = k_ratio *x_Volume
+x_Volume = k_ratio**2 *x_Volume
 
 #Finds all the local mins and maxes
 tv_maxes = x_Volume[argrelextrema(x_Volume, np.greater_equal, order =7)]
-tv_mins = x_Volume[argrelextrema(x_Volume, np.less_equal, order = 5)]
+tv_mins = x_Volume[argrelextrema(x_Volume, np.less_equal, order = 7)]
 
 
 #Finds the tidal volume by the difference between the local maxes and mins.
@@ -175,19 +192,24 @@ elif len(tv_maxes) > len(tv_mins):
 else:
     tv = tv_maxes - tv_mins
 
-#Turns TV from a distance measure to a volume measure.
 
-
-mean_tv = sum(tv)/len(tv)
-print(mean_tv)
+median_tv = np.median(tv)
+print(median_tv)
 
 #removes all correspondence that does not fall within this range,
 #above half of mean value
+if median_tv < 0.1:
+    tv = [i for i in tv if i > median_tv/2]
+    median_tv = np.median(tv)
+    
+tv = [i for i in tv if i > median_tv/2]
 
-tv = [i for i in tv if i > mean_tv/2] 
 
+median_tv = np.median(tv)
+print(median_tv)
 
-Plotting(tv_expected,tv,file)
+#Histogram
+Plotting(tv_expected,tv,median_tv, file)
 
 
 

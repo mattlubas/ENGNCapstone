@@ -1,6 +1,7 @@
 # Excel / CSV git ignore
 *.csv
 *.xls
+*.xlsx
 *.xlm
 
 #Ignore Photos

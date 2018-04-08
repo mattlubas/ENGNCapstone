@@ -24,6 +24,24 @@ static float step_total = N / deg_add;
 // User-modifiable parameters
 static float tidal_vol = 2; //mL units.
 static float f = 2 ;// frequency of the device. Units in Hz  // Integrate as a user function.
+static char Nozzle = 'B';  // Either B for Blue, G for Green, or R for Red
+
+// For finding the new nozzles, use https://jensenglobal.com/pages/standard-dispensing-tips#nt-premium-series
+//Using the mm diameter as D, inv_nozzle_area = 4*Pi() / D^2. 
+
+if (Nozzle = 'B') {
+  static float inv_nozzle_area = 30.2972;
+} else if (Nozzle = 'G') {
+  static float inv_nozzle_area = 7.218;
+} else if (Nozzle = 'R') {
+  static float inv_nozzle_area = 75.3396;
+}
+
+static float x = 0.1627; //added for creating accurate tidal volume given mechanical inaccuracy.
+static float w = 0.0028; //coefficient for adding to tidal volume given nozzle size.
+static float y = 0.08; //coefficient for adding to tidal given frequency input.
+
+static float adaption= w*inv_nozzle_area + y*f + x;
 
 //Time of Study to be used as a global variable.
 static unsigned long time_initial;
@@ -92,6 +110,7 @@ void loop() {
 		float AMP = (theta_f - theta_i)*k; //angle moved by the servo motor
 		float rad = step_index * 2000 / 57296; // converting angle deg to radians through approximation
 		//its 2000 in order to incorporate negative and positive outputs from the below sine function
+    // same as pi over 180.
 
 		// x is starting from mid-point, 90, and is the angle used to write the servo motor.
 		float angle_servo = FRC_initial + 2*AMP * sin (rad); 
@@ -106,7 +125,7 @@ void loop() {
 
 		myservo.write (angle_servo);
 
-		float time_delay = 1000/(step_total*f);
+		float time_delay = 1000/(step_total*f); // 1000 for the milliseconds
 
 		//Serial.println("Time Delay:");
 		//Serial.println(time_delay);
