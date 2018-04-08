@@ -24,24 +24,29 @@ static float step_total = N / deg_add;
 // User-modifiable parameters
 static float tidal_vol = 2; //mL units.
 static float f = 2 ;// frequency of the device. Units in Hz  // Integrate as a user function.
-static char Nozzle = 'B';  // Either B for Blue, G for Green, or R for Red
+String Nozzle = "B";  // Either B for Blue, G for Green, or R for Red. You can add more nozzles by the following directions:
 
-// For finding the new nozzles, use https://jensenglobal.com/pages/standard-dispensing-tips#nt-premium-series
-//Using the mm diameter as D, inv_nozzle_area = 4*Pi() / D^2. 
+// For finding the new nozzles, use https://jensenglobal.com/pages/standard-dispensing-tips#nt-premium-series ;
+//Using the mm diameter as D, inv_nozzle_area = 4*Pi() / D^2. ;
+float inv_nozzle_area = 30.2972;
 
-if (Nozzle = 'B') {
-  static float inv_nozzle_area = 30.2972;
-} else if (Nozzle = 'G') {
-  static float inv_nozzle_area = 7.218;
-} else if (Nozzle = 'R') {
-  static float inv_nozzle_area = 75.3396;
-}
-
-static float x = 0.1627; //added for creating accurate tidal volume given mechanical inaccuracy.
+/*
+  if (Nozzle == "B") {
+    static float inv_nozzle_area = 30.2972; 
+  }
+  else if (Nozzle == 'G') {
+    float inv_nozzle_area = 7.218;
+  }
+  else if (Nozzle == 'R'){
+    float inv_nozzle_area = 75.3396;
+  }
+*/  
+static float x = 0.1627; //x= 0.12 //added for creating accurate tidal volume given mechanical inaccuracy. Rounded down
 static float w = 0.0028; //coefficient for adding to tidal volume given nozzle size.
 static float y = 0.08; //coefficient for adding to tidal given frequency input.
 
-static float adaption= w*inv_nozzle_area + y*f + x;
+//Adaption factor for ensuring tidal volume is closer given mechanical errors.
+
 
 //Time of Study to be used as a global variable.
 static unsigned long time_initial;
@@ -58,7 +63,11 @@ void loop() {
 
 	// Update values that depend on user input tidal_vol, f --------------------------------------
 	//converting tidal_vol to mm^3
-	float tidal_vol_mm3 = tidal_vol *1000;
+  float tidal_vol_mm3 = tidal_vol *1000;
+  
+  //Adaption factor for ensuring tidal volume is closer given mechanical errors.
+  //Unit Converstion from mL to mm^3
+  float adaption_mm= ((w* inv_nozzle_area + y*f + x)*1000)/area;
 
 	//finding change in distance that the piston cylinder will move through
 	float delta_x = tidal_vol_mm3 / area;
@@ -107,7 +116,7 @@ void loop() {
 	// Run the motors based on our computations ----------------------------------------------------
 	for (float step_index = 0; step_index <= N; step_index=step_index+deg_add) {
 
-		float AMP = (theta_f - theta_i)*k; //angle moved by the servo motor
+		float AMP = adaption_mm+(theta_f - theta_i)*k; //angle moved by the servo motor
 		float rad = step_index * 2000 / 57296; // converting angle deg to radians through approximation
 		//its 2000 in order to incorporate negative and positive outputs from the below sine function
     // same as pi over 180.
@@ -118,7 +127,8 @@ void loop() {
 		// theta_i is initial positioneeds to be replaced by the cacluated FRC
 		//Amplitude is doubled to reach the amplitude desired.
 
-		float distance = angle_servo*k;
+    // Removing adaptation as desired distance is not changing by actual adaption is.
+		float distance = angle_servo*k - adaptation_mm;
 
 		//Serial.println("angle servo");
 		//Serial.println(angle_servo);
