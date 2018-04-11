@@ -28,7 +28,9 @@ String Nozzle = "B";  // Either B for Blue, G for Green, or R for Red. You can a
 
 // For finding the new nozzles, use https://jensenglobal.com/pages/standard-dispensing-tips#nt-premium-series ;
 //Using the mm diameter as D, inv_nozzle_area = 4*Pi() / D^2. ;
-float inv_nozzle_area = 30.2972;
+float inv_nozzle_area = 30.2972; 
+
+///was not changed for Volume 3, which means, each one is always +0.0848 increase to adaptation_mm for all nozzles.
 
 /*
   if (Nozzle == "B") {
@@ -116,13 +118,13 @@ void loop() {
 	// Run the motors based on our computations ----------------------------------------------------
 	for (float step_index = 0; step_index <= N; step_index=step_index+deg_add) {
 
-		float AMP = adaptation_mm+(theta_f - theta_i)*k; //angle moved by the servo motor
+		float AMP = adaptation_mm+2*(theta_f - theta_i)*k; //angle moved by the servo motor
 		float rad = step_index * 2000 / 57296; // converting angle deg to radians through approximation
 		//its 2000 in order to incorporate negative and positive outputs from the below sine function
     // same as pi over 180.
 
 		// x is starting from mid-point, 90, and is the angle used to write the servo motor.
-		float angle_servo = FRC_initial + 2*AMP * sin (rad); 
+		float angle_servo = FRC_initial + AMP * sin (rad); //2*AMP
 
 		// theta_i is initial positioneeds to be replaced by the cacluated FRC
 		//Amplitude is doubled to reach the amplitude desired.
@@ -135,7 +137,7 @@ void loop() {
 
 		myservo.write (angle_servo);
 
-		float time_delay = 1000/(step_total*f); // 1000 for the milliseconds
+		float time_delay = 1000/(step_total*f); // Divide by 1000 for milliseconds
 
 		//Serial.println("Time Delay:");
 		//Serial.println(time_delay);

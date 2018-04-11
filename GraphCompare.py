@@ -40,7 +40,10 @@ def TidalVolume(file):
     
     x= [] #create list of x in order to use floats instead of strings.
     for item in d:
-        
+
+
+        #if error around Tidal Volume comes up when commented out- use this
+        #statement, or vice versa.
         if item[:5] == "Tidal":
             item = 0
 
@@ -85,8 +88,8 @@ def TidalVolume(file):
     #print(tv_mins)
 
     #Finds the tidal volume by the difference between the local maxes and mins.
-    #tv_expected = tv_maxes - tv_mins
-    #print(tv_expected)
+    tv_expected = tv_maxes - tv_mins
+    print(tv_expected)
 
 
     #plt.plot(tv_expected)
@@ -106,6 +109,7 @@ def Plotting(tv_expected, tv_actual, mean_tv, file):
     plt.xlabel('Number of Breaths')
     plt.ylabel('Tidal Volume (mL)')
     plt.title('Tidal Volume: Expected vs Actual '+ file)
+    plt.ylim((1, 2)) #may take out for bigger graphs
     plt.legend()
 
     plt.savefig(OutputFolder+'TidalVolume-'+file+'.png', bbox_inches='tight')
@@ -117,13 +121,14 @@ def Plotting(tv_expected, tv_actual, mean_tv, file):
 ###################################
 ###################################
 
-
-workbook = "TidalVolumeRuns/"
-file = "G-3-1.4-1"
+workbook_old = "TidalVolumeRuns/"
+workbook = "Validation2/"
+file = "B-1.8-2.2-1"
 
 TidalVolume(workbook+file+".csv")
+#TidalVolume(workbook_old+file+".csv")
 
-OutputFolder = "TidalVolumeGraphs/"
+OutputFolder ="Validation2/TidalVolumeGraphs/"
 
 ###################################
 ###################################
@@ -136,7 +141,9 @@ Ts = 1.0/Fs # sampling interval
 k_ratio = 0.269/.2485 #conversion because k value was not re-calculated when
 #we ran the first sampling.
 
-df = pd.read_excel(workbook+file +".xls")
+#df = pd.read_excel(workbook+file +".xls")
+df = pd.read_excel(workbook_old+file +".xls")
+
 length =len(df.index)
 
 #position where Kinovea values start
@@ -208,9 +215,14 @@ tv = [i for i in tv if i > median_tv/2]
 median_tv = np.median(tv)
 print(median_tv)
 
-#Histogram
-Plotting(tv_expected,tv,median_tv, file)
 
+
+
+
+Plotting(tv_expected,tv,median_tv, file)
+#Plotting(tv_expected,tv_expected,tv_expected,file)
+
+#Plotting(tv,tv,median_tv, file)
 
 
 
