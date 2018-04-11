@@ -1,38 +1,60 @@
-# Stoichastic Absorption Rates Modeled on Cayley Trees
-Research by Justin Pusztay, Matt Lubas, and Griffin Noe, for research with Dr. Irina Mazilu at Washington and Lee University.
+# Respir-Rat Capstone Project
+Capstone Design Project by Matt Lubas , Eric Wirth and Alfred Rwajagu
 
-## Getting Started
+##Getting Started
 
-The code on Github provides a framework for understanding attachment and de-attachment, or change of states for many different applications like drug encapsulations, thin films interference, voter models, epidemic models, social models, community dynamics and more.
-
-Cayley Tree (also known as Bethe Lattice) and Lattice are examples of different network structures to represent occupation of nodes (each circle) depending on the status of their neighbors (the circles connected by lines). 
-Each Cayley Tree has a specified number of generations and number of connections. The number of generations (starting with 0) is the beginning of the Cayley Tree, and represents the number of connections away from the central node. The connections represent the number of edges each node has (except for the last generation of nodes).
-
-![alt text](https://upload.wikimedia.org/wikipedia/commons/e/e7/Reseau_de_Bethe.svg) 
-
-An example of a Cayley Tree marking each generation in color with 3 connections.
+The Device here mimic rodent respiration in a device by controlling for speed, volume moved, and airway resistance.
 
 ### Prerequisites
-The entire model and processing is completed on Python3. 
+The device runs and exports data using Python3 and Arduino. Using a Teensy micro-controller the device is compatible with Arduino.
 You can download python at the following link:
 https://www.python.org/
+You can download Arduino at the following link:
+https://www.arduino.cc/en/Main/Software
 
-To run the entire CayleyTree with graphics, excel output, GUI, and monte carlo simulation,the following import packages are needed:
+To use Teensy with the Arduino setup, use the following link and directions to install and run a teensy:
+https://www.pjrc.com/teensy/td_download.html
 
-networkx
+
+To run the entire Python Code with ability to visualize plots and export data to excel, the following import packages are needed for python.
+
+pandas
 matplotlib
 numpy
-random
-xlsxwriter
-math
+scipy
+threading
+time
+serial
 
-To install these packages on Terminal for  Mac OSX/ Linux, or Command Prompt on Windows, copy and paste the following lines:
+To install these packages on Terminal for  Mac OSX/ Linux, use the following code lines in Terminal:
+
 
 ```
-pip install networkx
+pip3 install pandas
+pip3 install matplotlib
+pip3 install numpy
+pip3 install threading
+pip3 install serial
+pip3 install time
+pip3 install scipy
+pip3 install xlrd
+pip3 install xlwt
+pip3 install decimal
+```
+
+To use on Command Prompt on Windows, copy and paste the following lines:
+
+```
+pip install pandas
 pip install matplotlib
 pip install numpy
-pip install xlsxwriter
+pip install threading
+pip install serial
+pip install time
+pip install scipy
+pip install xlrd
+pip install xlwt
+pip install decimal
 ```
 
 ### Installing
@@ -40,32 +62,25 @@ pip install xlsxwriter
 To download the Repository, open Terminal/ Command Prompt to the desired location, and run the following line:
 
 ```
-git clone https://github.com/noe98/Cayley
+git clone https://github.com/mattlubas/ENGNCapstone
 ```
 If you are having trouble navigating around Terminal, you can use the following as a resource. https://www.tbi.univie.ac.at/~ronny/Leere/270038/tutorial/node8.html
 
 
-Once dowloaded, run cayleymain.py or latticemain.py depending on the structure you desire.
-Using this, a GUI will pop, up, and you can decide the number of generations and connections you want for a Cayley Tree, or the dimensions of the lattice graphics. 
-
-By simulating using the variables alpha, beta, and gamma for the following equations, the code can demonstrate the occupation/ emptiness of nodes over large periods of time.
-
-![alt text](https://raw.githubusercontent.com/noe98/Cayley/Photos/nearestneighbors.png)
+Once dowloaded, upload and run servo_movement-3 in order to use the Respir-Rat.
 
 
-![alt text](https://raw.githubusercontent.com/noe98/Cayley/Photos/particleattachment.png)
 
 
 ## Built With
 
 * Python 3 [https://www.python.org/]
-
+* Arduino 
+* Teensy
 
 ## Authors
 
-See also the list of [contributors](https://github.com/noe98/Cayley) who participated in this project.
+See also the list of [contributors](https://github.com/mattlubas/ENGNCapstone) who participated in this project.
 
 ## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
